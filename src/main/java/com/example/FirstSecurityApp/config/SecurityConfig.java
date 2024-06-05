@@ -8,18 +8,21 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     private final PersonDetailsService personDetailsService;
+    private final JWTFilter jwtFilter;
 
     @Autowired
-    public SecurityConfig(PersonDetailsService personDetailsService) {
+    public SecurityConfig(PersonDetailsService personDetailsService, JWTFilter jwtFilter) {
         this.personDetailsService = personDetailsService;
+        this.jwtFilter = jwtFilter;
     }
 
     // конфигурируем сам Spring Security
@@ -29,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
 
                 // откл. защит. от межсайтовой подделки запросов
-                //  .csrf().disable()
+                .csrf().disable()
 
                 // authorization
                 .authorizeRequests()
@@ -46,7 +49,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/auth/login");
+                .logoutSuccessUrl("/auth/login")
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     //Настраивает аутентификацию
@@ -61,4 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManager() throws Exception {
+//        return super.authenticationManager();
+//    }
 }

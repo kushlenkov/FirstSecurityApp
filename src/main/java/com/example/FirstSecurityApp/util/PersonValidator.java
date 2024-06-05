@@ -26,7 +26,9 @@ public class PersonValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Person person = (Person) target;
 
-        if (personValidService.findUserWithSameUsername(person.getUsername()))
+        if (personValidService.findUserWithSameUsername(person.getUsername())) {
             errors.rejectValue("username", "", "Человек с таким именем уже существует");
+            System.out.println("Человек с таким именем уже существует"); // просто для визуализации
+        }
     }
 }
