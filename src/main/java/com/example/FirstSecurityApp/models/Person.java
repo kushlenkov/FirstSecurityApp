@@ -5,6 +5,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+/**
+ * @author Neil Alishev
+ */
 @Entity
 @Table(name = "Person")
 public class Person {
@@ -18,7 +21,7 @@ public class Person {
     @Column(name = "username")
     private String username;
 
-    @Min(value = 1900, message = "Год рождения не должен быть меньше, чем 1900")
+    @Min(value = 1900, message = "Год рождения должен быть больше, чем 1900")
     @Column(name = "year_of_birth")
     private int yearOfBirth;
 
@@ -28,9 +31,8 @@ public class Person {
     @Column(name = "role")
     private String role;
 
-    // For Spring
+    // Конструктор по умолчанию нужен для Spring
     public Person() {
-
     }
 
     public Person(String username, int yearOfBirth) {
@@ -85,7 +87,6 @@ public class Person {
                 ", username='" + username + '\'' +
                 ", yearOfBirth=" + yearOfBirth +
                 ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
                 '}';
     }
 }

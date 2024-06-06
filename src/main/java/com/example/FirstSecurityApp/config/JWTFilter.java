@@ -15,8 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author Neil Alishev
+ */
 @Component
 public class JWTFilter extends OncePerRequestFilter {
+
     private final JWTUtil jwtUtil;
     private final PersonDetailsService personDetailsService;
 
@@ -26,15 +30,14 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = httpServletRequest.getHeader("Authorization");
 
         if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
 
             if (jwt.isBlank()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Invalid JWT Token in Bearer Header");
             } else {
                 try {
@@ -42,20 +45,20 @@ public class JWTFilter extends OncePerRequestFilter {
                     UserDetails userDetails = personDetailsService.loadUserByUsername(username);
 
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                            new UsernamePasswordAuthenticationToken(userDetails,
                                     userDetails.getPassword(),
                                     userDetails.getAuthorities());
 
-                    if (SecurityContextHolder.getContext() == null) {
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } catch (JWTVerificationException exc) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token");
+                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Invalid JWT Token");
                 }
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }
