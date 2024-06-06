@@ -47,7 +47,7 @@ public class JWTFilter extends OncePerRequestFilter {
                                     userDetails.getPassword(),
                                     userDetails.getAuthorities());
 
-                    if (SecurityContextHolder.getContext() == null) {
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) { // тут была ошибка
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } catch (JWTVerificationException exc) {
