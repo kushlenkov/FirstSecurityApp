@@ -1,6 +1,5 @@
 package com.example.FirstSecurityApp.models;
 
-
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
